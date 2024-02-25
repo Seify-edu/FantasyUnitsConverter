@@ -11,7 +11,6 @@ class ConverterViewController: UIViewController, UITableViewDelegate, UITableVie
 
     var segmentControl = UISegmentedControl(items: ["Конвертер", "История"])
     var unitTableView = UITableView()
-    var historyTableView = UITableView()
 
     var units = FantasticUnits.allCases
     var selectedFromUnit: FantasticUnits? = nil
@@ -19,7 +18,6 @@ class ConverterViewController: UIViewController, UITableViewDelegate, UITableVie
 
     var conversionHistory: [ConversionEvent] = []
 
-    var isShowingConverter: Bool = true
     var isFirstUnitSelecting: Bool = false
     var isSecondUnitSelecting: Bool = false
 
@@ -29,6 +27,8 @@ class ConverterViewController: UIViewController, UITableViewDelegate, UITableVie
 
         return controller
     }()
+
+    let historyViewController = HistoryViewController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,16 +46,13 @@ class ConverterViewController: UIViewController, UITableViewDelegate, UITableVie
         unitTableView.dataSource = self
         unitTableView.isHidden = true
         unitTableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        historyTableView.dataSource = self
-        historyTableView.delegate = self
-        historyTableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
 
         updateUI()
     }
 
     func addSubviews() {
         view.addSubview(convertationViewController.view)
-        view.addSubview(historyTableView)
+        view.addSubview(historyViewController.view)
         view.addSubview(segmentControl)
         view.addSubview(unitTableView)
     }
@@ -64,7 +61,7 @@ class ConverterViewController: UIViewController, UITableViewDelegate, UITableVie
         segmentControl.translatesAutoresizingMaskIntoConstraints = false
         convertationViewController.view.translatesAutoresizingMaskIntoConstraints = false
         unitTableView.translatesAutoresizingMaskIntoConstraints = false
-        historyTableView.translatesAutoresizingMaskIntoConstraints = false
+        historyViewController.view.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
             segmentControl.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
@@ -81,66 +78,43 @@ class ConverterViewController: UIViewController, UITableViewDelegate, UITableVie
             unitTableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             unitTableView.heightAnchor.constraint(equalToConstant: 300),
 
-            historyTableView.topAnchor.constraint(equalTo: segmentControl.bottomAnchor, constant: 8),
-            historyTableView.leftAnchor.constraint(equalTo: view.leftAnchor),
-            historyTableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            historyTableView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            historyViewController.view.topAnchor.constraint(equalTo: segmentControl.bottomAnchor, constant: 8),
+            historyViewController.view.leftAnchor.constraint(equalTo: view.leftAnchor),
+            historyViewController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            historyViewController.view.rightAnchor.constraint(equalTo: view.rightAnchor),
         ])
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if isShowingConverter {
-            return units.count
-        } else if !isShowingConverter {
-            return conversionHistory.count
-        }
-        return 0
+        units.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if isShowingConverter {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-            cell.textLabel?.text = units[indexPath.row].title
-            if indexPath.row % 2 == 0 {
-                cell.backgroundColor = .gray.withAlphaComponent(0.1)
-            } else if indexPath.row % 2 == 1 {
-                cell.backgroundColor = .gray.withAlphaComponent(0.05)
-            }
-            return cell
-        } else if !isShowingConverter {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-            let event = conversionHistory[indexPath.row]
-            cell.textLabel?.text = event.description()
-            cell.backgroundColor = .white
-            return cell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        cell.textLabel?.text = units[indexPath.row].title
+        if indexPath.row % 2 == 0 {
+            cell.backgroundColor = .gray.withAlphaComponent(0.1)
+        } else if indexPath.row % 2 == 1 {
+            cell.backgroundColor = .gray.withAlphaComponent(0.05)
         }
-        return UITableViewCell()
+        return cell
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if isShowingConverter {
-            if isFirstUnitSelecting {
-                convertationViewController.show(to: "Нажми для выбора единицы измерения")
-                selectedFromUnit = units[indexPath.row]
-                selectedToUnit = nil
-                convertationViewController.show(from: units[indexPath.row].title)
-                units = FantasticUnits.possibleConversions(for: selectedFromUnit!)
-                tableView.reloadData()
-            } else if isSecondUnitSelecting {
-                selectedToUnit = units[indexPath.row]
-                convertationViewController.show(to: units[indexPath.row].title)
-            }
-
-            unitTableView.isHidden = true
-            convert()
-        } else if !isShowingConverter {
-            tableView.deselectRow(at: indexPath, animated: true)
-            let event = conversionHistory[indexPath.row]
-            let alertTitle = event.description()
-            let alertController = UIAlertController(title: "Детали конвертации", message: alertTitle, preferredStyle: .alert)
-            alertController.addAction(UIAlertAction(title: "OK", style: .default))
-            present(alertController, animated: true)
+        if isFirstUnitSelecting {
+            convertationViewController.show(to: "Нажми для выбора единицы измерения")
+            selectedFromUnit = units[indexPath.row]
+            selectedToUnit = nil
+            convertationViewController.show(from: units[indexPath.row].title)
+            units = FantasticUnits.possibleConversions(for: selectedFromUnit!)
+            tableView.reloadData()
+        } else if isSecondUnitSelecting {
+            selectedToUnit = units[indexPath.row]
+            convertationViewController.show(to: units[indexPath.row].title)
         }
+
+        unitTableView.isHidden = true
+        convert()
     }
 
     func convert() {
@@ -150,30 +124,27 @@ class ConverterViewController: UIViewController, UITableViewDelegate, UITableVie
     }
 
     func updateUI() {
-        switchState()
+        switchState(isShowingConverter: true)
         segmentControl.selectedSegmentIndex = 0
     }
 
     @objc func segmentChanged(_ sender: UISegmentedControl) {
-        isShowingConverter = sender.selectedSegmentIndex == 0
-        switchState()
+        let isShowingConverter = sender.selectedSegmentIndex == 0
+        switchState(isShowingConverter: isShowingConverter)
     }
 
-    func switchState() {
+    func switchState(isShowingConverter: Bool) {
         if isShowingConverter {
             convertationViewController.view.isHidden = false
+            historyViewController.view.isHidden = true
 
             unitTableView.isHidden = true
-            historyTableView.isHidden = true
             unitTableView.reloadData()
         } else if !isShowingConverter {
-            conversionHistory = ConverterController.shared.conversionHistory
-
             convertationViewController.view.isHidden = true
-
+            historyViewController.view.isHidden = false
+            historyViewController.update(history: ConverterController.shared.conversionHistory)
             unitTableView.isHidden = true
-            historyTableView.isHidden = false
-            historyTableView.reloadData()
         }
     }
 }
