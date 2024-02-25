@@ -7,15 +7,30 @@
 
 import UIKit
 
+protocol ConvertationViewControllerDelegate: AnyObject {
+    func didTapFrom()
+    func didTapTo()
+    func didUpdateAmount()
+}
+
 final class ConvertationViewController: UIViewController {
-    var labelTitle = UILabel()
-    var labelTitleFrom = UILabel()
-    var labelSelectedFromUnit = UILabel()
-    var textFieldAmount = UITextField()
-    var labelTitleTo = UILabel()
-    var labelSelectedToUnit = UILabel()
-    var labelTitleResult = UILabel()
-    var labelResult = UILabel()
+    private var labelTitle = UILabel()
+    private var labelTitleFrom = UILabel()
+    private var labelSelectedFromUnit = UILabel()
+    private var textFieldAmount = UITextField()
+    private var labelTitleTo = UILabel()
+    private var labelSelectedToUnit = UILabel()
+    private var labelTitleResult = UILabel()
+    private var labelResult = UILabel()
+
+    weak var delegate: ConvertationViewControllerDelegate?
+
+    var amount: Double {
+        guard let textAmount = textFieldAmount.text, let doubleAmount = Double(textAmount) else {
+            return 0
+        }
+        return doubleAmount
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -101,13 +116,29 @@ final class ConvertationViewController: UIViewController {
 
     @objc func tapFrom() {
         view.endEditing(true)
+
+        delegate?.didTapFrom()
     }
 
     @objc func tapTo() {
         view.endEditing(true)
+
+        delegate?.didTapTo()
     }
 
     @objc func textFieldDidChange(_ textField: UITextField) {
-//        convert()
+        delegate?.didUpdateAmount()
+    }
+
+    func show(result: Double) {
+        labelResult.text = "Результат: \(result)"
+    }
+
+    func show(from text: String) {
+        labelSelectedFromUnit.text = text
+    }
+
+    func show(to text: String) {
+        labelSelectedToUnit.text = text
     }
 }

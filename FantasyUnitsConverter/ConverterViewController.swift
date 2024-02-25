@@ -23,7 +23,12 @@ class ConverterViewController: UIViewController, UITableViewDelegate, UITableVie
     var isFirstUnitSelecting: Bool = false
     var isSecondUnitSelecting: Bool = false
 
-    let convertationViewController = ConvertationViewController()
+    lazy var convertationViewController = {
+        let controller = ConvertationViewController()
+        controller.delegate = self
+
+        return controller
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -83,27 +88,6 @@ class ConverterViewController: UIViewController, UITableViewDelegate, UITableVie
         ])
     }
 
-    @objc func textFieldDidChange(_ textField: UITextField) {
-        convert()
-    }
-
-    @objc func tapFrom() {
-        // Bad practice: mixing view logic with model logic, no separation of concerns
-        view.endEditing(true)
-        units = FantasticUnits.allCases
-        unitTableView.reloadData()
-        isFirstUnitSelecting = true
-        isSecondUnitSelecting = false
-        unitTableView.isHidden = false
-    }
-
-    @objc func tapTo() {
-        view.endEditing(true)
-        isFirstUnitSelecting = false
-        isSecondUnitSelecting = true
-        unitTableView.isHidden = false
-    }
-
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if isShowingConverter {
             return units.count
@@ -136,15 +120,15 @@ class ConverterViewController: UIViewController, UITableViewDelegate, UITableVie
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if isShowingConverter {
             if isFirstUnitSelecting {
-//                labelSelectedToUnit.text = "Нажми для выбора единицы измерения"
+                convertationViewController.show(to: "Нажми для выбора единицы измерения")
                 selectedFromUnit = units[indexPath.row]
                 selectedToUnit = nil
-//                labelSelectedFromUnit.text = units[indexPath.row].title
+                convertationViewController.show(from: units[indexPath.row].title)
                 units = FantasticUnits.possibleConversions(for: selectedFromUnit!)
                 tableView.reloadData()
             } else if isSecondUnitSelecting {
                 selectedToUnit = units[indexPath.row]
-//                labelSelectedToUnit.text = units[indexPath.row].title
+                convertationViewController.show(to: units[indexPath.row].title)
             }
 
             unitTableView.isHidden = true
@@ -160,9 +144,9 @@ class ConverterViewController: UIViewController, UITableViewDelegate, UITableVie
     }
 
     func convert() {
-//        guard let selectedFromUnit, let selectedToUnit else { return }
-//        let result = ConverterController.shared.convert(from: selectedFromUnit, to: selectedToUnit, amount: Double(textFieldAmount.text ?? "0") ?? 0.0)
-//        labelResult.text = "Результат: \(result)"
+        guard let selectedFromUnit, let selectedToUnit else { return }
+        let result = ConverterController.shared.convert(from: selectedFromUnit, to: selectedToUnit, amount: convertationViewController.amount)
+        convertationViewController.show(result: result)
     }
 
     func updateUI() {
@@ -191,5 +175,27 @@ class ConverterViewController: UIViewController, UITableViewDelegate, UITableVie
             historyTableView.isHidden = false
             historyTableView.reloadData()
         }
+    }
+}
+
+//MARK: - ConvertationViewControllerDelegate
+
+extension ConverterViewController: ConvertationViewControllerDelegate {
+    func didTapFrom() {
+        units = FantasticUnits.allCases
+        unitTableView.reloadData()
+        isFirstUnitSelecting = true
+        isSecondUnitSelecting = false
+        unitTableView.isHidden = false
+    }
+    
+    func didTapTo() {
+        isFirstUnitSelecting = false
+        isSecondUnitSelecting = true
+        unitTableView.isHidden = false
+    }
+
+    func didUpdateAmount() {
+        convert()
     }
 }
