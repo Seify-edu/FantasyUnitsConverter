@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		558EEF3D2B8BC9E3000C2D8E /* ConvertationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558EEF3C2B8BC9E3000C2D8E /* ConvertationViewController.swift */; };
 		558EEF3F2B8BFE41000C2D8E /* HistoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558EEF3E2B8BFE41000C2D8E /* HistoryViewController.swift */; };
+		558EEF412B8C0554000C2D8E /* UnitSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558EEF402B8C0554000C2D8E /* UnitSelectionViewController.swift */; };
 		9605FB152B84D465006DE90E /* FantasticUnits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9605FB142B84D465006DE90E /* FantasticUnits.swift */; };
 		9605FB172B84D56E006DE90E /* ConversionEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9605FB162B84D56E006DE90E /* ConversionEvent.swift */; };
 		9631D3592B86733F00B45946 /* ConverterViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9631D3582B86733F00B45946 /* ConverterViewControllerTests.swift */; };
@@ -42,6 +43,7 @@
 /* Begin PBXFileReference section */
 		558EEF3C2B8BC9E3000C2D8E /* ConvertationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConvertationViewController.swift; sourceTree = "<group>"; };
 		558EEF3E2B8BFE41000C2D8E /* HistoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewController.swift; sourceTree = "<group>"; };
+		558EEF402B8C0554000C2D8E /* UnitSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitSelectionViewController.swift; sourceTree = "<group>"; };
 		9605FB142B84D465006DE90E /* FantasticUnits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FantasticUnits.swift; sourceTree = "<group>"; };
 		9605FB162B84D56E006DE90E /* ConversionEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversionEvent.swift; sourceTree = "<group>"; };
 		9631D3582B86733F00B45946 /* ConverterViewControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConverterViewControllerTests.swift; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 				9651FBB22B7BBB520061FDF7 /* ConverterViewController.swift */,
 				558EEF3C2B8BC9E3000C2D8E /* ConvertationViewController.swift */,
 				558EEF3E2B8BFE41000C2D8E /* HistoryViewController.swift */,
+				558EEF402B8C0554000C2D8E /* UnitSelectionViewController.swift */,
 				9651FC1C2B7BBDA50061FDF7 /* ConverterController.swift */,
 				9605FB162B84D56E006DE90E /* ConversionEvent.swift */,
 				9605FB142B84D465006DE90E /* FantasticUnits.swift */,
@@ -272,6 +275,7 @@
 				9605FB172B84D56E006DE90E /* ConversionEvent.swift in Sources */,
 				9605FB152B84D465006DE90E /* FantasticUnits.swift in Sources */,
 				9651FBB32B7BBB520061FDF7 /* ConverterViewController.swift in Sources */,
+				558EEF412B8C0554000C2D8E /* UnitSelectionViewController.swift in Sources */,
 				9651FC1D2B7BBDA50061FDF7 /* ConverterController.swift in Sources */,
 				9651FBAF2B7BBB520061FDF7 /* AppDelegate.swift in Sources */,
 				558EEF3F2B8BFE41000C2D8E /* HistoryViewController.swift in Sources */,
