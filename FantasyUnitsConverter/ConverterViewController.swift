@@ -16,8 +16,6 @@ class ConverterViewController: UIViewController, UITableViewDelegate, UITableVie
     var selectedFromUnit: FantasticUnits? = nil
     var selectedToUnit: FantasticUnits? = nil
 
-    var conversionHistory: [ConversionEvent] = []
-
     var isFirstUnitSelecting: Bool = false
     var isSecondUnitSelecting: Bool = false
 
