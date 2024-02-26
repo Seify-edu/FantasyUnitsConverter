@@ -9,6 +9,8 @@ import UIKit
 
 class ConverterViewController: UIViewController {
 
+    var archive: History = ConversionHistory()
+
     var segmentControl = UISegmentedControl(items: ["Конвертер", "История"])
 
     lazy var convertationViewController = {
@@ -95,7 +97,7 @@ class ConverterViewController: UIViewController {
         } else if !isShowingConverter {
             convertationViewController.view.isHidden = true
             historyViewController.view.isHidden = false
-            historyViewController.update(history: ConverterController.shared.conversionHistory)
+            historyViewController.update(history: archive.conversionHistory)
         }
     }
 

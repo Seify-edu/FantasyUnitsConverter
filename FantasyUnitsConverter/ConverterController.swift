@@ -15,8 +15,6 @@ class ConverterController {
 
     static let shared = ConverterController()
 
-    var conversionHistory: [ConversionEvent] = []
-
     func convert(from unit: FantasticUnits, to targetUnit: FantasticUnits, amount value: Double) throws -> Double {
 
         var outputValue: Double = 0.0
@@ -90,29 +88,8 @@ class ConverterController {
             throw(ConversionError.unsupportedPair)
         }
 
-        let event = ConversionEvent(
-            fromUnit: unit,
-            toUnit: targetUnit,
-            outputValue: outputValue,
-            timestamp: Date()
-        )
-        addRecordToHistory(event)
-
         return outputValue
     }
-
-    func addRecordToHistory(_ event: ConversionEvent) {
-        conversionHistory.append(event)
-    }
-
-    func clearHistory() {
-        conversionHistory.removeAll()
-    }
-
-    func findInHistory(query: (ConversionEvent) -> Bool) -> [ConversionEvent] {
-        conversionHistory.filter(query)
-    }
-
 }
 
 
