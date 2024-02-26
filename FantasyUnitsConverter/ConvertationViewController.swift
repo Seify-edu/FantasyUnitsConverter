@@ -25,6 +25,26 @@ final class ConvertationViewController: UIViewController {
 
     weak var delegate: ConvertationViewControllerDelegate?
 
+    var selectedFromUnit: FantasticUnits? = nil {
+        didSet {
+            if let selectedFromUnit {
+                labelSelectedFromUnit.text = selectedFromUnit.title
+            } else {
+                labelSelectedFromUnit.text = "Нажми для выбора единицы измерения"
+            }
+        }
+    }
+
+    var selectedToUnit: FantasticUnits? = nil {
+        didSet {
+            if let selectedToUnit {
+                labelSelectedFromUnit.text = selectedToUnit.title
+            } else {
+                labelSelectedFromUnit.text = "Нажми для выбора единицы измерения"
+            }
+        }
+    }
+
     var amount: Double {
         guard let textAmount = textFieldAmount.text, let doubleAmount = Double(textAmount) else {
             return 0
@@ -49,7 +69,6 @@ final class ConvertationViewController: UIViewController {
         labelSelectedToUnit.text = "Нажми для выбора единицы измерения"
         labelTitleResult.text = "Результат"
         labelResult.text = "Ожидается ввод..."
-
 
         textFieldAmount.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
         textFieldAmount.keyboardType = .numberPad
@@ -132,13 +151,5 @@ final class ConvertationViewController: UIViewController {
 
     func show(result: Double) {
         labelResult.text = "Результат: \(result)"
-    }
-
-    func show(from text: String) {
-        labelSelectedFromUnit.text = text
-    }
-
-    func show(to text: String) {
-        labelSelectedToUnit.text = text
     }
 }

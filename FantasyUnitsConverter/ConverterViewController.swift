@@ -11,9 +11,6 @@ class ConverterViewController: UIViewController {
 
     var segmentControl = UISegmentedControl(items: ["Конвертер", "История"])
 
-    var selectedFromUnit: FantasticUnits? = nil
-    var selectedToUnit: FantasticUnits? = nil
-
     lazy var convertationViewController = {
         let controller = ConvertationViewController()
         controller.delegate = self
@@ -68,7 +65,10 @@ class ConverterViewController: UIViewController {
     }
 
     func convert() {
-        guard let selectedFromUnit, let selectedToUnit else { return }
+        guard let selectedFromUnit = convertationViewController.selectedFromUnit,
+              let selectedToUnit = convertationViewController.selectedToUnit else {
+            return
+        }
         let result = ConverterController.shared.convert(from: selectedFromUnit, to: selectedToUnit, amount: convertationViewController.amount)
         convertationViewController.show(result: result)
     }
@@ -102,22 +102,19 @@ extension ConverterViewController: ConvertationViewControllerDelegate {
         let controller = UnitSelectionViewController()
         controller.units = FantasticUnits.allCases
         controller.onSelection = { [weak self] unit in
-            self?.convertationViewController.show(to: "Нажми для выбора единицы измерения")
-            self?.selectedFromUnit = unit
-            self?.selectedToUnit = nil
-            self?.convertationViewController.show(from: unit.title)
+            self?.convertationViewController.selectedToUnit = nil
+            self?.convertationViewController.selectedFromUnit = unit
             self?.dismiss(animated: true)
         }
         present(controller, animated: true)
     }
     
     func didTapTo() {
-        let units = FantasticUnits.possibleConversions(for: selectedFromUnit!)
+        let units = FantasticUnits.possibleConversions(for: convertationViewController.selectedFromUnit!)
         let controller = UnitSelectionViewController()
         controller.units = units
         controller.onSelection = {[weak self] unit in
-            self?.selectedToUnit = unit
-            self?.convertationViewController.show(to: unit.title)
+            self?.convertationViewController.selectedToUnit = unit
             self?.dismiss(animated: true)
         }
         present(controller, animated: true)
