@@ -7,15 +7,17 @@
 
 import UIKit
 
+enum ConversionError: Error {
+    case unsupportedPair
+}
+
 class ConverterController {
 
     static let shared = ConverterController()
 
-    var view: UIViewController?
-
     var conversionHistory: [ConversionEvent] = []
 
-    func convert(from unit: FantasticUnits, to targetUnit: FantasticUnits, amount value: Double) -> Double {
+    func convert(from unit: FantasticUnits, to targetUnit: FantasticUnits, amount value: Double) throws -> Double {
 
         var outputValue: Double = 0.0
 
@@ -85,21 +87,7 @@ class ConverterController {
             outputValue = value * 1000.0
 
         default:
-            let alertController = UIAlertController(
-                title: "Ошибка",
-                message: "Конвертация между этими единицами не поддерживается",
-                preferredStyle: .alert
-            )
-            let okAction = UIAlertAction(title: "Ok", style: .default) { _ in
-                alertController.dismiss(animated: false)
-            }
-            alertController.addAction(okAction)
-
-            view?.present(alertController, animated: true)
-
-            // to log an error
-            print("Конвертация между этими единицами не поддерживается")
-            return value
+            throw(ConversionError.unsupportedPair)
         }
 
         let event = ConversionEvent(

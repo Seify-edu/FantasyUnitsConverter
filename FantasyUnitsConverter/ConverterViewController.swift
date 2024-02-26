@@ -30,7 +30,6 @@ class ConverterViewController: UIViewController {
         addSubviews()
         setupConstraints()
 
-        ConverterController.shared.view = self
         segmentControl.addTarget(self, action: #selector(segmentChanged), for: .valueChanged)
 
         updateUI()
@@ -69,8 +68,14 @@ class ConverterViewController: UIViewController {
               let selectedToUnit = convertationViewController.selectedToUnit else {
             return
         }
-        let result = ConverterController.shared.convert(from: selectedFromUnit, to: selectedToUnit, amount: convertationViewController.amount)
-        convertationViewController.show(result: result)
+        do {
+            let result = try ConverterController.shared.convert(from: selectedFromUnit, to: selectedToUnit, amount: convertationViewController.amount)
+            convertationViewController.show(result: result)
+        } catch ConversionError.unsupportedPair {
+            showError(title: "Ошибка", message: "Пара не поддерживается")
+        } catch {
+            showError(title: "Ошибка", message: "Неизвестная ошибка")
+        }
     }
 
     func updateUI() {
@@ -92,6 +97,22 @@ class ConverterViewController: UIViewController {
             historyViewController.view.isHidden = false
             historyViewController.update(history: ConverterController.shared.conversionHistory)
         }
+    }
+
+    //MARK: - Error Handling
+
+    func showError(title: String, message: String) {
+        let alertController = UIAlertController(
+            title: title,
+            message: message,
+            preferredStyle: .alert
+        )
+        let okAction = UIAlertAction(title: "Ok", style: .default) { _ in
+            alertController.dismiss(animated: false)
+        }
+        alertController.addAction(okAction)
+
+        present(alertController, animated: true)
     }
 }
 
