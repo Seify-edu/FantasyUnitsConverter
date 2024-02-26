@@ -14,9 +14,6 @@ class ConverterViewController: UIViewController {
     var selectedFromUnit: FantasticUnits? = nil
     var selectedToUnit: FantasticUnits? = nil
 
-    var isFirstUnitSelecting: Bool = false
-    var isSecondUnitSelecting: Bool = false
-
     lazy var convertationViewController = {
         let controller = ConvertationViewController()
         controller.delegate = self
@@ -25,12 +22,6 @@ class ConverterViewController: UIViewController {
     }()
 
     let historyViewController = HistoryViewController()
-    lazy var unitSelectionViewController = {
-        let controller = UnitSelectionViewController()
-        controller.delegate = self
-
-        return controller
-    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,15 +29,12 @@ class ConverterViewController: UIViewController {
 
         addChild(convertationViewController)
         addChild(historyViewController)
-        addChild(unitSelectionViewController)
 
         addSubviews()
         setupConstraints()
 
         ConverterController.shared.view = self
         segmentControl.addTarget(self, action: #selector(segmentChanged), for: .valueChanged)
-
-        unitSelectionViewController.view.isHidden = true
 
         updateUI()
     }
@@ -55,13 +43,11 @@ class ConverterViewController: UIViewController {
         view.addSubview(convertationViewController.view)
         view.addSubview(historyViewController.view)
         view.addSubview(segmentControl)
-        view.addSubview(unitSelectionViewController.view)
     }
 
     func setupConstraints() {
         segmentControl.translatesAutoresizingMaskIntoConstraints = false
         convertationViewController.view.translatesAutoresizingMaskIntoConstraints = false
-        unitSelectionViewController.view.translatesAutoresizingMaskIntoConstraints = false
         historyViewController.view.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
@@ -73,11 +59,6 @@ class ConverterViewController: UIViewController {
             convertationViewController.view.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             convertationViewController.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             convertationViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-
-            unitSelectionViewController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            unitSelectionViewController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            unitSelectionViewController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            unitSelectionViewController.view.heightAnchor.constraint(equalToConstant: 300),
 
             historyViewController.view.topAnchor.constraint(equalTo: segmentControl.bottomAnchor, constant: 8),
             historyViewController.view.leftAnchor.constraint(equalTo: view.leftAnchor),
@@ -106,12 +87,10 @@ class ConverterViewController: UIViewController {
         if isShowingConverter {
             convertationViewController.view.isHidden = false
             historyViewController.view.isHidden = true
-            unitSelectionViewController.view.isHidden = true
         } else if !isShowingConverter {
             convertationViewController.view.isHidden = true
             historyViewController.view.isHidden = false
             historyViewController.update(history: ConverterController.shared.conversionHistory)
-            unitSelectionViewController.view.isHidden = true
         }
     }
 }
@@ -120,39 +99,31 @@ class ConverterViewController: UIViewController {
 
 extension ConverterViewController: ConvertationViewControllerDelegate {
     func didTapFrom() {
-        let units = FantasticUnits.allCases
-        unitSelectionViewController.update(units: units)
-        isFirstUnitSelecting = true
-        isSecondUnitSelecting = false
-        unitSelectionViewController.view.isHidden = false
+        let controller = UnitSelectionViewController()
+        controller.units = FantasticUnits.allCases
+        controller.onSelection = { [weak self] unit in
+            self?.convertationViewController.show(to: "Нажми для выбора единицы измерения")
+            self?.selectedFromUnit = unit
+            self?.selectedToUnit = nil
+            self?.convertationViewController.show(from: unit.title)
+            self?.dismiss(animated: true)
+        }
+        present(controller, animated: true)
     }
     
     func didTapTo() {
-        isFirstUnitSelecting = false
-        isSecondUnitSelecting = true
-        unitSelectionViewController.view.isHidden = false
+        let units = FantasticUnits.possibleConversions(for: selectedFromUnit!)
+        let controller = UnitSelectionViewController()
+        controller.units = units
+        controller.onSelection = {[weak self] unit in
+            self?.selectedToUnit = unit
+            self?.convertationViewController.show(to: unit.title)
+            self?.dismiss(animated: true)
+        }
+        present(controller, animated: true)
     }
 
     func didUpdateAmount() {
-        convert()
-    }
-}
-
-extension ConverterViewController: UnitSelectionViewControllerDelegate {
-    func didSelect(unit: FantasticUnits) {
-        if isFirstUnitSelecting {
-            convertationViewController.show(to: "Нажми для выбора единицы измерения")
-            selectedFromUnit = unit
-            selectedToUnit = nil
-            convertationViewController.show(from: unit.title)
-            let units = FantasticUnits.possibleConversions(for: selectedFromUnit!)
-            unitSelectionViewController.update(units: units)
-        } else if isSecondUnitSelecting {
-            selectedToUnit = unit
-            convertationViewController.show(to: unit.title)
-        }
-
-        unitSelectionViewController.view.isHidden = true
         convert()
     }
 }

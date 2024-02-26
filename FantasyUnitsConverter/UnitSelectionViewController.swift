@@ -7,14 +7,9 @@
 
 import UIKit
 
-protocol UnitSelectionViewControllerDelegate: AnyObject {
-    func didSelect(unit: FantasticUnits)
-}
-
 final class UnitSelectionViewController: UITableViewController {
     var units = FantasticUnits.allCases
-
-    weak var delegate: UnitSelectionViewControllerDelegate?
+    var onSelection: ((FantasticUnits) -> ())?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,7 +34,7 @@ final class UnitSelectionViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let selectedUnit = units[indexPath.row]
-        delegate?.didSelect(unit: selectedUnit)
+        onSelection?(selectedUnit)
     }
 
     func update(units: [FantasticUnits]) {
